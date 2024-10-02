@@ -5,6 +5,8 @@ import loginService from './services/login'
 import Notification from './components/Notification'
 import BlogForm from './components/blogForm'
 import LoginForm from './components/LoginForm'
+import userService from './services/user'
+import UserForm from './components/RegisterForm'
 
 
 const App = () => {
@@ -96,6 +98,31 @@ const App = () => {
       })
     }
     }
+    const handleUser = async (username, name, password) => {
+      try {
+        const user = await userService.user({
+          username,
+          name,
+          password,
+        })
+        blogService.setToken(user.token)
+        setUser(user)
+        setUsername('')
+        setName('')
+        setPassword('')
+        setNotification(`A new user named  '${user.name}' has been created!`)
+        setIsError(false)
+        setTimeout(() => {
+          setNotification(null)
+        }, 5000)
+      } catch (exception) {
+        setNotification('Failed to create user')
+        setIsError(true)
+        setTimeout(() => {
+          setNotification(null)
+        }, 5000)
+      }
+    }
     const sortedBlogs = blogs.sort((a, b) => b.likes - a.likes)
      const blogForm = () => {
     const hideWhenVisible = { display: blogVisible ? 'none' : '' }
@@ -118,6 +145,7 @@ const App = () => {
         <Notification message={notification} isError={isError} />
         <h2>Log in to application</h2>
         <LoginForm handleLogin={handleLogin} />
+        <UserForm handleUser={handleUser} />
       </div>  
     )
   }   
